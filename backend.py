@@ -1,3 +1,4 @@
+import asyncio
 import os
 import certifi
 from dotenv import load_dotenv
@@ -24,6 +25,7 @@ from langchain_core.messages import (
 from langchain_groq import ChatGroq
 from tools.flight_tool import search_flights
 from tools.tavily_search import WebSearchError, web_search
+from mcp_client_test import tavily_mcp_search
 
 MAX_QUERY_CHARS = 1500
 MAX_FLIGHT_CONTEXT_CHARS = 3500
@@ -93,7 +95,7 @@ def flight_agent(state: TravelState):
 def hotel_agent(state: TravelState):
     query = f"Hotels and accommodations for {state['user_query']}"
     try:
-        hotel_results = web_search(query)
+        hotel_results = asyncio.run(tavily_mcp_search(query))
     except WebSearchError as error:
         hotel_results = (
             f"Live hotel web search is unavailable: {error}\n"
